@@ -1,4 +1,5 @@
-Flask
 SQLAlchemy
-pyodbc
 gunicorn
+flask
+flask-cors
+pyodbc
