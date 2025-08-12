@@ -1,49 +1,40 @@
-
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, request, jsonify
+import pyodbc
 from datetime import datetime
-from sqlalchemy import create_engine, text
-import urllib
+from flask_cors import CORS  # <- thêm dòng này
 
 app = Flask(__name__)
-
-# SQL Server connection config
-params = urllib.parse.quote_plus(
-    "DRIVER={ODBC Driver 17 for SQL Server};"
-    "SERVER=DESKTOP-LF6CHGA\SQLEXPRESS;"
-    "DATABASE=Sun_Database;"
+CORS(app)  # <- thêm dòng này để cho phép CORS
+# ⚙️ Kết nối SQL Server
+conn_str = (
+    "Driver={SQL Server};"
+    "Server=DESKTOP-LF6CHGA\\SQLEXPRESS;"
+    "Database=Sun_Database;"
     "Trusted_Connection=yes;"
 )
-engine = create_engine(f"mssql+pyodbc:///?odbc_connect={params}")
+conn = pyodbc.connect(conn_str)
+cursor = conn.cursor()
 
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-@app.route('/api/checkin', methods=['POST'])
+@app.route("/api/checkin", methods=["POST"])
 def checkin():
-    data = request.json
-    emp_id = data.get('EmployeeId')
-    emp_name = data.get('EmployeeName')
-    latitude = data.get('Latitude')
-    longitude = data.get('Longitude')
-    checkin_time = datetime.now()
-    status = "Checked-in"
+    data = request.get_json()
+    emp_id = data.get("EmployeeId")
+    emp_name = data.get("EmployeeName")
+    latitude = data.get("Latitude")
+    longitude = data.get("Longitude")
+    time_now = datetime.now()
 
-    query = text("""
-        INSERT INTO HR_GPS_Attendance (EmployeeId, EmployeeName, CheckInTime, Latitude, Longitude, Status)
-        VALUES (:emp_id, :emp_name, :checkin_time, :latitude, :longitude, :status)
-    """)
-    with engine.begin() as conn:
-        conn.execute(query, {
-            'emp_id': emp_id,
-            'emp_name': emp_name,
-            'checkin_time': checkin_time,
-            'latitude': latitude,
-            'longitude': longitude,
-            'status': status
-        })
+    if not all([emp_id, emp_name, latitude, longitude]):
+        return jsonify({"status": "error", "message": "Missing fields"}), 400
 
-    return jsonify({"message": "Check-in successful"}), 200
+    query = """
+        INSERT INTO HR_GPS_Attendance (EmployeeId, EmployeeName, CheckInTime, Latitude, Longitude)
+        VALUES (?, ?, ?, ?, ?)
+    """
+    cursor.execute(query, (emp_id, emp_name, time_now, latitude, longitude))
+    conn.commit()
 
-if __name__ == '__main__':
-    app.run(debug=True)
+    return jsonify({"status": "success", "message": "Chấm công thành công"}), 200
+
+if __name__ == "__main__":
+    app.run(debug=True, port=5050)
