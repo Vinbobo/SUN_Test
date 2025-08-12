@@ -1,44 +1,68 @@
 
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
-  <title>GPS Check-in</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="description" content="Ứng dụng điểm danh GPS cho nhân viên">
+  <meta name="keywords" content="GPS, điểm danh, nhân viên, ứng dụng">
+  <meta name="author" content="SUN Test">
+  <link rel="stylesheet" href="style.css">
+  <title>Chấm công GPS</title>
+
 </head>
 <body>
-  <h2>GPS Check-in Form</h2>
-  <form id="checkinForm">
-    <label>Employee ID:</label><br>
-    <input type="text" id="empId" required><br><br>
-    <label>Employee Name:</label><br>
-    <input type="text" id="empName" required><br><br>
-    <button type="submit">Check In</button>
-  </form>
+  <div class="container">
+    <h2>Chấm công GPS</h2>
+    <form id="checkinForm">
+      <label for="empId">Mã nhân viên:</label><br>
+      <input type="text" id="empId" required placeholder="Nhập mã nhân viên"><br>
+      <label for="empName">Tên nhân viên:</label><br>
+      <input type="text" id="empName" required placeholder="Nhập tên nhân viên"><br>
+      <button type="submit">Điểm danh</button>
+    </form>
+      <p id="status"></p>
 
+  </div>
   <script>
-    document.getElementById('checkinForm').addEventListener('submit', function(e) {
+    document.getElementById("checkinForm").addEventListener("submit", function (e) {
       e.preventDefault();
 
       if (!navigator.geolocation) {
-        alert("GPS not supported by browser");
+        alert("Trình duyệt của bạn không hỗ trợ định vị GPS.");
         return;
       }
 
-      navigator.geolocation.getCurrentPosition(function(position) {
+      navigator.geolocation.getCurrentPosition(success, error);
+
+      function success(position) {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+
         const data = {
-          EmployeeId: document.getElementById('empId').value,
-          EmployeeName: document.getElementById('empName').value,
-          Latitude: position.coords.latitude,
-          Longitude: position.coords.longitude
+          EmployeeId: document.getElementById("empId").value,
+          EmployeeName: document.getElementById("empName").value,
+          Latitude: latitude,
+          Longitude: longitude
         };
 
-        fetch('/api/checkin', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        fetch("http://127.0.0.1:5050/api/checkin", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data)
-        }).then(res => res.json())
-          .then(response => alert(response.message))
-          .catch(err => alert("Error: " + err));
-      });
+        })
+        .then(response => response.json())
+        .then(result => {
+          document.getElementById("status").innerText = result.message;
+        })
+        .catch(err => {
+          document.getElementById("status").innerText = "Chấm công thất bại.";
+        });
+      }
+
+      function error() {
+        document.getElementById("status").innerText = "Không thể lấy vị trí của bạn.";
+      }
     });
   </script>
 </body>
