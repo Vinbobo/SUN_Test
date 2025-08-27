@@ -31,10 +31,6 @@ def get_address_from_latlng(lat, lng):
 def home():
     return render_template("index.html")
 
-@app.route("/records")
-def records():
-    return render_template("records.html")
-
 @app.route("/api/checkin", methods=["POST"])
 def checkin():
     data = request.get_json()
