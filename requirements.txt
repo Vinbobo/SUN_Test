@@ -1,5 +1,6 @@
-SQLAlchemy
+Flask
+Flask-Cors
+pymongo
 gunicorn
-flask
-flask-cors
-pyodbc
+datetime
+requests
