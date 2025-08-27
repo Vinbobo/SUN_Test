@@ -5,12 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dữ liệu chấm công</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f5f6fa; padding: 20px; }
+    body { font-family: Arial, sans-serif; background: #f4f6f9; padding: 20px; }
     .container { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    h2 { text-align: center; color: #273c75; }
+    h2 { text-align: center; color: #2c3e50; }
     table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-    th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
-    th { background: #eee; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #3498db; color: white; }
+    tr:nth-child(even) { background: #f9f9f9; }
   </style>
 </head>
 <body>
@@ -22,6 +23,8 @@
           <th>Mã NV</th>
           <th>Tên NV</th>
           <th>Thời gian</th>
+          <th>Lat</th>
+          <th>Lng</th>
           <th>Địa chỉ</th>
           <th>Status</th>
         </tr>
@@ -37,12 +40,15 @@
         const data = await res.json();
         const tbody = document.getElementById("data-body");
         tbody.innerHTML = "";
+
         data.forEach(row => {
           const tr = document.createElement("tr");
           tr.innerHTML = `
             <td>${row.EmployeeId || ""}</td>
             <td>${row.EmployeeName || ""}</td>
             <td>${row.CheckinTime ? new Date(row.CheckinTime).toLocaleString() : ""}</td>
+            <td>${row.Latitude || ""}</td>
+            <td>${row.Longitude || ""}</td>
             <td>${row.Address || "Không xác định"}</td>
             <td>${row.Status || ""}</td>
           `;
@@ -52,6 +58,8 @@
         console.error("Lỗi tải dữ liệu:", err);
       }
     }
+
+    // Tải dữ liệu khi mở trang
     loadData();
   </script>
 </body>

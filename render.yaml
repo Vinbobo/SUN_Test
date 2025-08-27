@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: gps-checkin-mongo
+    name: SUN_Test
     env: python
     buildCommand: ""
     startCommand: gunicorn app:app
