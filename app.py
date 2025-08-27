@@ -9,7 +9,7 @@ CORS(app)
 # 🔹 Kết nối MongoDB (sửa lại MONGO_URI cho đúng của bạn)
 MONGO_URI = os.getenv(
     "MONGO_URI",
-    "mongodb+srv://username:password@cluster0.mongodb.net/?retryWrites=true&w=majority"
+    "mongodb+srv://banhbaobeo2205:lm2hiCLXp6B0D7hq@cluster0.festnla.mongodb.net/?retryWrites=true&w=majority"
 )
 DB_NAME = os.getenv("DB_NAME", "Sun_Database_1")
 
