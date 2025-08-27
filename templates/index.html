@@ -22,8 +22,6 @@
           <th>Mã NV</th>
           <th>Tên NV</th>
           <th>Thời gian</th>
-          <th>Lat</th>
-          <th>Lng</th>
           <th>Địa chỉ</th>
           <th>Status</th>
         </tr>
@@ -45,8 +43,6 @@
             <td>${row.EmployeeId || ""}</td>
             <td>${row.EmployeeName || ""}</td>
             <td>${row.CheckinTime ? new Date(row.CheckinTime).toLocaleString() : ""}</td>
-            <td>${row.Latitude || ""}</td>
-            <td>${row.Longitude || ""}</td>
             <td>${row.Address || "Không xác định"}</td>
             <td>${row.Status || ""}</td>
           `;
