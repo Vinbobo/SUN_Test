@@ -1,69 +1,86 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
-  <meta name="description" content="Ứng dụng điểm danh GPS cho nhân viên">
-  <meta name="keywords" content="GPS, điểm danh, nhân viên, ứng dụng">
-  <meta name="author" content="SUN Test">
-  <link rel="stylesheet" href="style.css">
-  <title>Chấm công GPS</title>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dữ liệu chấm công</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f6fa;
+      padding: 20px;
+    }
+    .container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #273c75;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px;
+      text-align: left;
+    }
+    th {
+      background: #eee;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <h2>Chấm công GPS</h2>
-    <form id="checkinForm">
-      <label for="empId">Mã nhân viên:</label><br>
-      <input type="text" id="empId" required placeholder="Nhập mã nhân viên"><br>
-      <label for="empName">Tên nhân viên:</label><br>
-      <input type="text" id="empName" required placeholder="Nhập tên nhân viên"><br>
-      <button type="submit">Điểm danh</button>
-    </form>
-    <p id="status"></p>
-
+    <h2>Danh sách chấm công</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Mã NV</th>
+          <th>Tên NV</th>
+          <th>Thời gian</th>
+          <th>Lat</th>
+          <th>Lng</th>
+          <th>Địa chỉ</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="data-body"></tbody>
+    </table>
   </div>
+
   <script>
-    document.getElementById("checkinForm").addEventListener("submit", function (e) {
-      e.preventDefault();
-
-      if (!navigator.geolocation) {
-        alert("Trình duyệt của bạn không hỗ trợ định vị GPS.");
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(success, error);
-
-      function success(position) {
-        const latitude = position.coords.latitude;
-        const longitude = position.coords.longitude;
-
-        const data = {
-          EmployeeId: document.getElementById("empId").value,
-          EmployeeName: document.getElementById("empName").value,
-          Latitude: latitude,
-          Longitude: longitude
-        };
-
-        fetch("https://sun-test-1.onrender.com/api/checkin", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(result => {
-          document.getElementById("status").innerText = result.message;
+    function loadData() {
+      fetch("http://127.0.0.1:5000/api/attendances")  // 🔹 đổi thành API URL của bạn nếu deploy
+        .then(res => res.json())
+        .then(data => {
+          const tbody = document.getElementById("data-body");
+          tbody.innerHTML = "";
+          data.forEach(row => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>${row.EmployeeId || ""}</td>
+              <td>${row.EmployeeName || ""}</td>
+              <td>${row.CheckinTime ? new Date(row.CheckinTime).toLocaleString() : ""}</td>
+              <td>${row.Latitude || ""}</td>
+              <td>${row.Longitude || ""}</td>
+              <td>${row.Address || "Không xác định"}</td>
+              <td>${row.Status || ""}</td>
+            `;
+            tbody.appendChild(tr);
+          });
         })
         .catch(err => {
-          document.getElementById("status").innerText = "Chấm công thất bại.";
+          console.error("Lỗi tải dữ liệu:", err);
         });
-      }
-
-      function error() {
-        document.getElementById("status").innerText = "Không thể lấy vị trí của bạn.";
-      }
-    });
+    }
+    // Tải dữ liệu khi mở trang
+    loadData();
   </script>
 </body>
 </html>
